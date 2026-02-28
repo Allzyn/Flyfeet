@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="Imagens/FlyFeet.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <title>Carrinho - FlyFeet</title>
+</head>
+<body>
+    <header>
+        <h1>Carrinho</h1>
+        <nav>
+            <a href="index.html">Início</a>
+            <a href="#destaques">Destaques</a>
+            <a href="curtidos.html">Curtidos</a>
+        </nav>
+    </header>
+
+    <main id="carrinhoContainer"></main>
+
+    <script>
+        let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+        const container = document.getElementById("carrinhoContainer");
+
+        function atualizarCarrinho() {
+            container.innerHTML = "";
+            carrinho.forEach((produto, index) => {
+                const div = document.createElement("div");
+                div.className = "item-carrinho";
+                div.innerHTML = `
+                    <div class="imagem-bloco">
+                        <img src="${produto.imagem}" alt="${produto.nome}">
+                        <button class="btn-comprar">Comprar</button>
+                        <button class="btn-remover">Remover</button>
+                    </div>
+                    <div class="descricao-bloco">
+                        <h3>${produto.nome}</h3>
+                        <p>${gerarDescricao(produto.nome)}</p>
+                        <p><strong>${produto.preco}</strong></p>
+                    </div>
+                `;
+
+                div.querySelector(".btn-comprar").onclick = () => {
+                    window.location.href = "produto.html";
+                };
+
+                div.querySelector(".btn-remover").onclick = () => {
+                    carrinho.splice(index, 1);
+                    localStorage.setItem("carrinho", JSON.stringify(carrinho));
+                    atualizarCarrinho();
+                };
+
+                container.appendChild(div);
+            });
+        }
+
+        function gerarDescricao(nome) {
+            const textos = {
+                "Fly Sneak Shoes": "O Fly Sneak Shoes combina conforto e estilo urbano.",
+                "Fly Rainbow PRO": "O Fly Rainbow PRO oferece performance e cor vibrante.",
+                "Urban Max": "Design moderno e solado firme.",
+                "Soft Breeze": "Leve, respirável e macio."
+            };
+            return textos[nome] || "Modelo exclusivo FlyFeet.";
+        }
+
+        atualizarCarrinho();
+    </script>
+</body>
+</html>

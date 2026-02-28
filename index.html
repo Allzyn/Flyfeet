@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="Imagens/FlyFeet.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <title>FlyFeet</title>
+</head>
+<body>
+    <div id="topo">
+        <div id="menu">
+            <h2>FlyFeet</h2>
+            <a href="#destaques">Destaques</a>
+            <a href="#lancamentos">Lançamentos</a>
+            <a href="#" id="mostrarMasculinos">Masculino</a>
+            <a href="#" id="mostrarFemininos">Feminino</a>
+            <a href="#" id="mostrarTodos">Todos</a>
+        </div>
+
+        <div id="area-conta">
+            <a href="#">Ajuda</a>
+            <a id="entrarLink" href="login.html">Entrar</a>
+
+            <div id="usuarioInfo" style="display:none; align-items:center; gap:8px;">
+                <img id="iconePerfil" src="" alt="Usuário" width="30" style="border-radius:50%;">
+                <span id="nomeUsuario"></span>
+                <button id="botaoSair" style="margin-left:10px;">Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="busca">
+        🔍 <input type="text" id="campoBusca" placeholder="Buscar">
+        <button id="botaoBuscar">Buscar</button>
+        <button id="botaoCoracao" title="Curtidos">♡</button>
+        <button id="botaoCarrinho" title="Carrinho">🛒</button> 
+    </div>
+
+    <div id="banner">
+        <img src="Imagens/Sneck.png" alt="Banner FlyFeet" width="600">
+    </div>
+
+    <div id="destaques">
+        <h3>Produtos em destaque</h3>
+        <div id="produtos"></div>
+    </div>
+
+    <div id="lancamentos">
+        <h3>Lançamentos</h3>
+        <div id="produtosLancamentos"></div>
+    </div>
+
+    <script>
+        const nomeUsuario = localStorage.getItem("nomeUsuario");
+        const iconeUsuario = localStorage.getItem("iconeUsuario");
+        const usuarioInfo = document.getElementById("usuarioInfo");
+        const entrarLink = document.getElementById("entrarLink");
+        const nomeSpan = document.getElementById("nomeUsuario");
+        const iconeImg = document.getElementById("iconePerfil");
+        const botaoSair = document.getElementById("botaoSair");
+
+        if (nomeUsuario) {
+            nomeSpan.textContent = nomeUsuario;
+            iconeImg.src = iconeUsuario || "Imagens/defaultUser.png";
+            usuarioInfo.style.display = "inline-flex";
+            entrarLink.style.display = "none";
+        }
+
+        botaoSair.addEventListener("click", () => {
+            if (confirm("Deseja realmente sair da conta?")) {
+                localStorage.removeItem("nomeUsuario");
+                localStorage.removeItem("iconeUsuario");
+                window.location.href = "login.html";
+            }
+        });
+
+        const botaoCarrinho = document.getElementById("botaoCarrinho");
+        const botaoCoracao = document.getElementById("botaoCoracao");
+
+        botaoCarrinho.onclick = () => window.location.href = "carrinho.html";
+        botaoCoracao.onclick = () => window.location.href = "curtidos.html";
+
+        const produtos = [
+            { nome: "Fly Sneak Shoes", preco: "R$499,90", imagem: "Imagens/Fly Sneak Shoes.webp" },
+            { nome: "Fly Rainbow PRO", preco: "R$549,90", imagem: "Imagens/Fly Rainbow pro.webp" },
+            { nome: "Fly Red Pro", preco: "R$399,90", imagem: "Imagens/Fly Red PRO.webp" }
+        ];
+
+        const lancamentos = [
+            { nome: "Urban Max", preco: "R$499,90", imagem: "Imagens/Urban Max.webp", categoria: "masculino" },
+            { nome: "Street Pro", preco: "R$549,90", imagem: "Imagens/Street Pro.webp", categoria: "masculino" },
+            { nome: "Runner Pro", preco: "R$599,90", imagem: "Imagens/Runner Pro.webp", categoria: "masculino" },
+            { nome: "Glow Pink", preco: "R$499,90", imagem: "Imagens/Glow Pink.webp", categoria: "feminino" },
+            { nome: "Soft Breeze", preco: "R$529,90", imagem: "Imagens/Soft Breeze.webp", categoria: "feminino" },
+            { nome: "Light Air", preco: "R$579,90", imagem: "Imagens/Light Air.webp", categoria: "feminino" }
+        ];
+
+        const produtosDiv = document.getElementById("produtos");
+        const produtosLancamentosDiv = document.getElementById("produtosLancamentos");
+
+        function verProduto(nome, imagem, preco) {
+            localStorage.setItem("produtoSelecionado",
+                JSON.stringify({ nome, imagem, preco })
+            );
+            window.location.href = "produto.html";
+        }
+
+        function adicionarCarrinho(produto) {
+            const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+            carrinho.push(produto);
+            localStorage.setItem("carrinho", JSON.stringify(carrinho));
+            alert("Adicionado ao carrinho!");
+        }
+
+        function adicionarFavorito(produto) {
+            const favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
+            if (!favoritos.find(p => p.nome === produto.nome)) {
+                favoritos.push(produto);
+                localStorage.setItem("favoritos", JSON.stringify(favoritos));
+                alert("Adicionado aos curtidos!");
+            } else {
+                alert("Este produto já está na lista de curtidos!");
+            }
+        }
+
+        function cardProduto(p) {
+            return `
+                <div class="produto">
+                    <img src="${p.imagem}" width="150">
+                    <br><span>${p.nome} - ${p.preco}</span><br>
+                    <button onclick="verProduto('${p.nome}', '${p.imagem}', '${p.preco}')">
+                        Comprar
+                    </button>
+                    <button onclick='adicionarCarrinho(${JSON.stringify(p)})'>Adicionar ao Carrinho</button>
+                    <button onclick='adicionarFavorito(${JSON.stringify(p)})'>♡ Curtir</button>
+                </div>
+            `;
+        }
+
+        function renderizarProdutos() {
+            produtosDiv.innerHTML = produtos.map(p => cardProduto(p)).join("");
+        }
+
+        function renderizarLancamentos(lista = lancamentos) {
+            produtosLancamentosDiv.innerHTML = lista.map(p => cardProduto(p)).join("");
+        }
+
+        renderizarProdutos();
+        renderizarLancamentos();
+
+        document.getElementById("mostrarTodos").onclick = () => renderizarLancamentos(lancamentos);
+        document.getElementById("mostrarMasculinos").onclick = () => {
+            renderizarLancamentos(lancamentos.filter(p => p.categoria === "masculino"));
+        };
+        document.getElementById("mostrarFemininos").onclick = () => {
+            renderizarLancamentos(lancamentos.filter(p => p.categoria === "feminino"));
+        };
+
+        const campoBusca= document.getElementById("campoBusca");
+        const botaoBuscar= document.getElementById("botaoBuscar");
+        const banner= document.getElementById("banner");
+
+        botaoBuscar.onclick = buscarProduto;
+        campoBusca.addEventListener("keyup", e=> {
+            if (e.key=== "Enter") buscarProduto();  //teclado//
+        });
+
+        function buscarProduto() {
+            const termo = campoBusca.value.toLowerCase().trim(); //termo digitado//
+            const todos = [...produtos, ...lancamentos].filter(p =>  //realiza a pesquisa//
+                p.nome.toLowerCase().includes(termo) // ignora maiuscula e minúscula//
+            );
+
+            if (termo === "") { 
+                banner.style.display = "block";
+                renderizarProdutos();
+                renderizarLancamentos();  
+                return;
+            }
+
+            banner.style.display = "none";
+            produtosDiv.innerHTML = todos.map(p => cardProduto(p)).join(""); 
+            produtosLancamentosDiv.innerHTML = "";
+        }
+    </script>
+</body>
+</html>

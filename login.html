@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Login FlyFeet</title>
+</head>
+<body>
+    <div class="main-login">
+        <div class="left-login">
+            <h1>Voe Conosco <br> Faça Login e entre para o nosso time</h1>
+        </div>
+        <div class="right-login">
+            <div class="card-login">
+                <h1>LOGIN</h1>
+                <div class="textfield">
+                    <label for="usuario">Usuário</label>
+                    <input type="text" id="usuario" placeholder="Usuário">
+                </div>
+                <div class="textfield">
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" placeholder="Senha">
+                </div>
+                <div class="textfield">
+                    <label for="icone">Ícone de Usuário (opcional)</label>
+                    <input type="file" id="icone" accept="image/*">
+                </div>
+                <button class="btn-login" id="btnLogin">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const btnLogin = document.getElementById("btnLogin");
+        const usuarioInput = document.getElementById("usuario");
+        const senhaInput = document.getElementById("senha");
+        const iconeInput = document.getElementById("icone");
+
+        btnLogin.addEventListener("click", () => {
+            const usuario = usuarioInput.value.trim();
+            const senha = senhaInput.value.trim();
+
+            if (usuario === "" || senha === "") {
+                alert("Preencha todos os campos");
+                return;
+            }
+
+            if (iconeInput.files.length > 0) {
+                const leitor = new FileReader();
+                leitor.onload = function(e) {
+                    localStorage.setItem("iconeUsuario", e.target.result);
+                    localStorage.setItem("nomeUsuario", usuario);
+                    window.location.href = "index.html";
+                };
+                leitor.readAsDataURL(iconeInput.files[0]);
+            } else {
+                localStorage.setItem("nomeUsuario", usuario);
+                localStorage.removeItem("iconeUsuario");
+                window.location.href = "index.html";
+            }
+        });
+    </script>
+</body>
+</html>
